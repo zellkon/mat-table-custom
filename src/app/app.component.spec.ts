@@ -19,7 +19,7 @@ describe('AppComponent', () => {
   it(`should have as title 'mat-table-custom'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('mat-table-custom');
+    expect('').toEqual('mat-table-custom');
   });
 
   it('should render title', () => {
