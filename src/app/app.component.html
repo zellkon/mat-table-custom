@@ -14,7 +14,22 @@
     <th mat-header-cell *matHeaderCellDef [resizeColumn]="true" [index]="i">
       <div cdkDrag cdkDragLockAxis="x" mat-sort-header>
         {{column}}
-      </div></th>
+      </div>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item>
+            <mat-icon>dialpad</mat-icon>
+            <span>Redial</span>
+          </button>
+          <button mat-menu-item disabled>
+            <mat-icon>voicemail</mat-icon>
+            <span>Check voice mail</span>
+          </button>
+          <button mat-menu-item>
+            <mat-icon>notifications_off</mat-icon>
+            <span>Disable alerts</span>
+          </button>
+        </mat-menu>
+    </th>
     <td mat-cell *matCellDef="let element">
       {{element[column]}}
     </td>
