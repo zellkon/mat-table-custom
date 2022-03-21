@@ -8,7 +8,6 @@
   </mat-form-field>
 </div>
 
-
 <table mat-table [dataSource]="dataSource" matSort cdkDropList cdkDropListOrientation="horizontal"
   (cdkDropListDropped)="dropCol($event)">
   <ng-container *ngFor="let column of displayedColumns; let i = index;" [matColumnDef]="column">

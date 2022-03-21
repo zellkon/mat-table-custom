@@ -39,7 +39,6 @@ export class AppComponent implements OnInit,AfterViewInit{
     this.dataSource = new MatTableDataSource(ELEMENT_DATA);
   }
   ngOnInit(): void {
-    // this.setDisplayedColumns();
   }
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;

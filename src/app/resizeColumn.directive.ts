@@ -51,18 +51,19 @@ export class ResizeColumnDirective implements OnInit {
       // Calculate width of column
       let width =
         this.startWidth + (event.pageX - this.startX - offset);
-
-      const tableCells = Array.from(this.table.querySelectorAll(".mat-row")).map(
-        (row: any) => row.querySelectorAll(".mat-cell").item(this.index)
-      );
-
-      // Set table header width
-      this.renderer.setStyle(this.column, "width", `${width}px`);
-
-      // Set table cells width
-      for (const cell of tableCells) {
-        this.renderer.setStyle(cell, "width", `${width}px`);
-      }
+        if(width >= 100) {
+          const tableCells = Array.from(this.table.querySelectorAll(".mat-row")).map(
+            (row: any) => row.querySelectorAll(".mat-cell").item(this.index)
+          );
+    
+          // Set table header width
+          this.renderer.setStyle(this.column, "width", `${width}px`);
+    
+          // Set table cells width
+          for (const cell of tableCells) {
+            this.renderer.setStyle(cell, "width", `${width}px`);
+          }
+        }
     }
   };
 
