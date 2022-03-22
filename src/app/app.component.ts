@@ -4,7 +4,6 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { CdkDragDrop, CdkDragEnter, CdkDragStart, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import * as _ from 'lodash';
 export interface Object {
   name: string;
   position: number;
@@ -138,7 +137,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
     return newData;
   }
-
   test(data: any) {
     console.log(data);
   }
