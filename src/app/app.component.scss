@@ -14,7 +14,9 @@
         text-overflow: ellipsis;
       }
     }
+   
     .mat-header-cell {
+      background: cornflowerblue;
       min-width: 100px;
       position: relative;      
       &:not(:last-child) {
@@ -44,7 +46,12 @@
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   }
   .cdk-drag-preview {
-    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 100px;
+    min-height: 30px;
+    background: darkgray;
     color: black;
     box-sizing: border-box;
     border-radius: 4px;
@@ -54,4 +61,7 @@
   }
   .cdk-drag-placeholder {
     opacity: 0;
+  }
+  ::ng-deep .mat-sort-header-arrow {
+    color: red !important;
   }
