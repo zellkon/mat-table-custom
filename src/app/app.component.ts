@@ -84,7 +84,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   dropGroup(event: CdkDragDrop<any>) {
     if (this.groupFilterItems.findIndex(x => x.includes(event.item.data)) === -1) {
       this.groupFilterItems.push(event.item.data);
-      console.log(this.groupByMultipleFields(this.dataSource.data, this.groupFilterItems));
+      console.log(this.groupByMultipleField(this.dataSource.data, this.groupFilterItems));
     }
   }
   removeGroupFilterItem(column: string) {
@@ -125,7 +125,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     }, {})
   }
 
-  groupByMultipleFields(data: any, ...fields: any) {
+  groupByMultipleField(data: any, ...fields: any) {
     if (fields.length === 0) return;
     let newData: any = {};
     const [field] = fields;
@@ -133,7 +133,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     const remainingFields = fields.slice(1);
     if (remainingFields.length > 0) {
       Object.keys(newData).forEach((key) => {
-        newData[key] = this.groupByMultipleFields(newData[key], ...remainingFields)
+        newData[key] = this.groupByMultipleField(newData[key], ...remainingFields)
       })
     }
     return newData;
