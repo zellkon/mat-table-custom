@@ -13,26 +13,39 @@
   <ng-container *ngFor="let column of displayedColumns; let i = index;" [matColumnDef]="column">
     <th mat-header-cell *matHeaderCellDef [resizeColumn]="true" [index]="i">
       <div fxLayout="row" fxLayoutAlign="space-between center">
-        <div fxLayout="row" fxLayoutAlign="start center">
-          <div cdkDrag cdkDragLockAxis="x">
-            {{column}}
-          </div>
-          <div style="margin-left: 20px;" mat-sort-header></div>
+        <div cdkDrag cdkDragLockAxis="x" mat-sort-header>
+          {{column}}
         </div>
         <div>
+          <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
           <mat-menu #menu="matMenu">
-            <button mat-menu-item>
-              <mat-icon>dialpad</mat-icon>
-              <span>Redial</span>
-            </button>
-            <button mat-menu-item disabled>
-              <mat-icon>voicemail</mat-icon>
-              <span>Check voice mail</span>
-            </button>
-            <button mat-menu-item>
-              <mat-icon>notifications_off</mat-icon>
-              <span>Disable alerts</span>
-            </button>
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <button mat-menu-item #col_filter (click)="$event.stopPropagation(); showColFilter = !showColFilter">
+                <mat-icon>reorder</mat-icon>
+                <span>Columns</span>
+              </button>
+              <div *ngIf="showColFilter" style="width: 100%; padding: 16px 16px 16px 16px;" fxLayout="column" fxLayoutAlign="center start">
+                <div *ngFor="let column of displayedColumns">
+                    <mat-checkbox [checked]="checkColumn(column)" (click)="$event.stopPropagation();">{{column}}</mat-checkbox>
+                </div>
+                <div fxLayout="row" fxLayoutAlign="space-between center">
+                  <button mat-raised-button color="basic">Reset</button>
+                  <button mat-raised-button color="primary">Apply</button>
+                </div>
+              </div>
+            </div>
+
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <button mat-menu-item (click)="$event.stopPropagation(); showFilter = !showFilter">
+                <mat-icon>filter_alt</mat-icon>
+                <span>Filter</span>
+              </button>
+              <div *ngIf="showFilter">
+                TEST 2
+              </div>
+            </div>
           </mat-menu>
         </div>
       </div>

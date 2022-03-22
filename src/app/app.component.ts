@@ -35,6 +35,8 @@ export class AppComponent implements OnInit,AfterViewInit{
   displayedColumns: string[] = ['name', 'weight', 'symbol', 'position'];
   columnsToDisplay: string[] = this.displayedColumns.slice();
   dataSource: MatTableDataSource<Object>;
+  showColFilter= false;
+  showFilter= false;
   constructor() {
     this.dataSource = new MatTableDataSource(ELEMENT_DATA);
   }
@@ -92,5 +94,11 @@ export class AppComponent implements OnInit,AfterViewInit{
       moveItemInArray(this.dataSource.data, event.previousIndex, event.currentIndex);
      }
   }
-  // resize Col
+  // resize Col by Directive
+  test(data: any): void {
+    console.log(data);
+  }
+  checkColumn(column: string): boolean {
+    return this.columnsToDisplay.find(x => x.includes(column)) ? true : false;
+  }
 }
