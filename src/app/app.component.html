@@ -1,4 +1,4 @@
-<div fxLayout="column" fxLayoutAlign="center center">
+<div style="width: 100%;" fxLayout="column" fxLayoutAlign="center center">
   <div style="width: 100%;" fxLayout="row" fxLayoutAlign="space-between center">
     <div>
       <mat-form-field appearance="outline">
@@ -11,16 +11,16 @@
       <button mat-raised-button>Export to PDF</button>
     </div>
   </div>
-  
-  <div fxLayout="column" fxLayoutAlign="center center" cdkDropListGroup>
-    <div style="height: 100px; width: 100%; display: flex; justify-content: start; align-items: center; background: lightgray;" cdkDropList (cdkDropListDropped)="dropGroup($event)">
+
+  <div style="width: 100%;" fxLayout="column" fxLayoutAlign="center center" cdkDropListGroup>
+    <div
+      style="height: 100px; width: 100%; display: flex; justify-content: start; align-items: center; background: lightgray;"
+      cdkDropList (cdkDropListDropped)="dropGroup($event)">
       <span *ngIf="groupFilterItems.length <= 0">
         Drag a column header and drop it here to group by that column
       </span>
       <mat-chip-list>
-        <mat-chip
-          *ngFor="let item of groupFilterItems"
-          (removed)="removeGroupFilterItem(item)">
+        <mat-chip *ngFor="let item of groupFilterItems" (removed)="removeGroupFilterItem(item)">
           {{item}}
           <button matChipRemove>
             <mat-icon>cancel</mat-icon>
@@ -28,8 +28,8 @@
         </mat-chip>
       </mat-chip-list>
     </div>
-    <div>
-      <table mat-table [dataSource]="dataSource" matSort cdkDropList cdkDropListOrientation="horizontal"
+    <div style="width: 100%;">
+      <table mat-table multiTemplateDataRows [dataSource]="dataSource" matSort cdkDropList cdkDropListOrientation="horizontal"
         (cdkDropListDropped)="dropCol($event)">
         <ng-container *ngFor="let column of columnsToDisplay; let i = index;" [matColumnDef]="column">
           <th mat-header-cell *matHeaderCellDef [resizeColumn]="true" [index]="i">
@@ -38,12 +38,13 @@
                 {{column}}
               </div>
               <div>
-                <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+                <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Menu">
                   <mat-icon>more_vert</mat-icon>
                 </button>
                 <mat-menu #menu="matMenu">
                   <div fxLayout="column" fxLayoutAlign="center center">
-                    <button mat-menu-item #col_filter (click)="$event.stopPropagation(); showColFilter = !showColFilter">
+                    <button mat-menu-item #col_filter
+                      (click)="$event.stopPropagation(); showColFilter = !showColFilter">
                       <mat-icon>reorder</mat-icon>
                       <span>Columns</span>
                     </button>
@@ -60,7 +61,7 @@
                       </div>
                     </div>
                   </div>
-  
+
                   <div fxLayout="column" fxLayoutAlign="center center">
                     <button mat-menu-item (click)="$event.stopPropagation(); showFilter = !showFilter">
                       <mat-icon>filter_alt</mat-icon>
@@ -78,6 +79,16 @@
             {{element[column]}}
           </td>
         </ng-container>
+         <!-- Group Table -->
+          <ng-container matColumnDef="groupHeader">
+            <td mat-cell [attr.colspan]="columnsToDisplay.length" *matCellDef="let dataSourceGroup">
+              <div *ngFor="let item of groupFilterItems; let i = index">
+                <strong>{{dataSourceGroup[item]}}</strong>
+              </div>
+            </td>
+            </ng-container>
+            <tr [ngStyle]="groupFilterItems.length > 0 ? {} : {'display': 'none'}" mat-row *matRowDef="let row; columns: ['groupHeader'];"></tr>
+          <!--End Group Table -->
         <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
         <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
       </table>

@@ -41,6 +41,7 @@ export class ResizeColumnDirective implements OnInit {
     this.pressed = true;
     this.startX = event.pageX;
     this.startWidth = this.column.offsetWidth;
+    console.log(this.table);
   };
 
   onMouseMove = (event: MouseEvent) => {
@@ -55,7 +56,6 @@ export class ResizeColumnDirective implements OnInit {
           const tableCells = Array.from(this.table.querySelectorAll(".mat-row")).map(
             (row: any) => row.querySelectorAll(".mat-cell").item(this.index)
           );
-    
           // Set table header width
           this.renderer.setStyle(this.column, "width", `${width}px`);
     

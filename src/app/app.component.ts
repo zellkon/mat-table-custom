@@ -12,7 +12,7 @@ export interface Object {
 }
 const ELEMENT_DATA: Object[] = [
   { position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H' },
-  { position: 1, name: 'Helium', weight: 4.0026, symbol: 'H' },
+  { position: 2, name: 'Helium', weight: 4.0026, symbol: 'H' },
   { position: 2, name: 'Lithium', weight: 6.941, symbol: 'L' },
   { position: 3, name: 'Beryllium', weight: 9.0122, symbol: 'B' },
   { position: 4, name: 'Boron', weight: 10.811, symbol: 'B' },
@@ -38,6 +38,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   columsForFilter: any[] = this.displayedColumns.map(x => ({ column: x, display: true }));
   dataSource: MatTableDataSource<Object>;
   groupFilterItems: string[] = [];
+  dataSourceGroup: any;
+  groupRow: string [] = ['1','2'];
   showColFilter = false;
   showFilter = false;
   constructor() {
@@ -83,9 +85,12 @@ export class AppComponent implements OnInit, AfterViewInit {
   dropGroup(event: CdkDragDrop<any>) {
     if (this.groupFilterItems.findIndex(x => x.includes(event.item.data)) === -1) {
       this.groupFilterItems.push(event.item.data);
-      console.log(this.groupByMultipleField(this.dataSource.data, this.groupFilterItems));
     }
+    this.dataSourceGroup = this.groupByMultipleField(this.dataSource.data, ...this.groupFilterItems);
+    // this.groupRow = Object.keys(this.dataSourceGroup);
+    console.log(this.dataSourceGroup);
   }
+
   removeGroupFilterItem(column: string) {
     this.groupFilterItems.splice(this.groupFilterItems.findIndex(x => x.includes(column)), 1);
   }
@@ -104,27 +109,17 @@ export class AppComponent implements OnInit, AfterViewInit {
   resetFilterCol() {
     this.columsForFilter = this.displayedColumns.map(x => ({ column: x, display: true }));
   }
-  // func Group By Key for Data
+  // func Group By Field for Data
 
-  groupBySingleField(data: any, field: any) {
-    return data.reduce((acc: any, val: any) => {
-      const rest = Object.keys(val).reduce((newObj: any, key) => {
-        if (key !== field) {
-          newObj[key] = val[key]
-        }
-        return newObj;
-      }, {});
-      if (acc[val[field]]) {
-        acc[val[field]].push(rest);
-      } else {
-        ;
-        acc[val[field]] = [rest];
-      }
+  groupBySingleField(data: any[], field: string) {
+    return data.reduce((acc:any, value: any) => {
+      (acc[value[field]] = acc[value[field]] || []).push(value);
       return acc;
-    }, {})
+    }, {});
   }
 
   groupByMultipleField(data: any, ...fields: any) {
+    console.log(fields)
     if (fields.length === 0) return;
     let newData: any = {};
     const [field] = fields;
@@ -136,6 +131,11 @@ export class AppComponent implements OnInit, AfterViewInit {
       })
     }
     return newData;
+  }
+
+  isGroup(index: any, item: any): boolean {
+    console.log(this.dataSourceGroup)
+    return this.dataSourceGroup;
   }
   test(data: any) {
     console.log(data);
