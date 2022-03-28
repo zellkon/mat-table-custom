@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from 'src/material.module';
 import { ResizeColumnDirective } from './resizeColumn.directive';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ExcelService } from './excel.service';
 
 @NgModule({
   declarations: [	
@@ -18,7 +19,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     MaterialModule,
     FlexLayoutModule
   ],
-  providers: [],
+  providers: [ExcelService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -7,7 +7,7 @@
       </mat-form-field>
     </div>
     <div>
-      <button mat-raised-button>Export to Excel</button>
+      <button mat-raised-button (click)="exportAsExcel()">Export to Excel</button>
       <button mat-raised-button>Export to PDF</button>
     </div>
   </div>
@@ -29,7 +29,7 @@
       </mat-chip-list>
     </div>
     <div style="width: 100%;">
-      <table mat-table [dataSource]="dataSource" matSort cdkDropList
+      <table #table mat-table [dataSource]="dataSource" matSort cdkDropList
         cdkDropListOrientation="horizontal" (cdkDropListDropped)="dropCol($event)">
         <ng-container *ngFor="let column of columnsToDisplay; let i = index;" [matColumnDef]="column">
           <th mat-header-cell *matHeaderCellDef [resizeColumn]="true" [index]="i">
@@ -62,7 +62,7 @@
                     </div>
                   </div>
 
-                  <div fxLayout="column" fxLayoutAlign="center center">
+                  <!-- <div fxLayout="column" fxLayoutAlign="center center">
                     <button mat-menu-item (click)="$event.stopPropagation(); showFilter = !showFilter">
                       <mat-icon>filter_alt</mat-icon>
                       <span>Filter</span>
@@ -70,7 +70,7 @@
                     <div *ngIf="showFilter">
                       TEST 2
                     </div>
-                  </div>
+                  </div> -->
                 </mat-menu>
               </div>
             </div>
@@ -80,7 +80,7 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="groupHeader">
-          <td style="background: darkcyan;" [attr.colspan]="columnsToDisplay.length" mat-cell *matCellDef="let group"
+          <td style="background: rgb(33, 166, 228);" [attr.colspan]="columnsToDisplay.length" mat-cell *matCellDef="let group"
             [style.paddingLeft.px]="20*group.level">
             <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10">
               <mat-icon style="color: chartreuse;" *ngIf="group.expanded">remove_circle_outline</mat-icon>
@@ -98,7 +98,7 @@
         <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
         <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
       </table>
-      <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of objects"></mat-paginator>
+      <mat-paginator role="group" [pageSizeOptions]="[50, 100]" (page)="paging($event)" [pageSize]="pageSize"></mat-paginator>
     </div>
   </div>
 </div>

@@ -1,9 +1,11 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { CdkDragDrop, CdkDragEnter, CdkDragStart, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { MatCheckboxChange } from '@angular/material/checkbox';
+import * as XLSX from 'xlsx';
+import { ExcelService } from './excel.service';
 export interface Object {
   name: string;
   position: number;
@@ -39,6 +41,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatSort)
   sort!: MatSort;
+  @ViewChild('table') table!: ElementRef;
   @ViewChild(MatPaginator)
   paginator!: MatPaginator;
   displayedColumns: string[] = ['name', 'weight', 'symbol', 'position'];
@@ -52,14 +55,17 @@ export class AppComponent implements OnInit, AfterViewInit {
   showColFilter = false;
   showFilter = false;
   groupByColumns: string[] = [];
-  constructor() {
+  pageSize = 50;
+  constructor(
+    private excelService:ExcelService
+  ) {
     this.dataSource.data = this.addGroups(ELEMENT_DATA, this.groupByColumns);
     this.dataSource.filterPredicate = this.customFilterPredicate.bind(this);
   }
   ngOnInit(): void {
   }
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator; 
+    this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
   applyFilter(event: Event) {
@@ -68,15 +74,15 @@ export class AppComponent implements OnInit, AfterViewInit {
     let allDataKey = '';
     const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
     ELEMENT_DATA.forEach((value: any) => {
-      Object.keys(value).forEach( key => {
-        allDataKey+= value[key].toString();
+      Object.keys(value).forEach(key => {
+        allDataKey += value[key].toString();
       })
       if (allDataKey.toLowerCase().includes(filterValue)) {
         result.push(value);
       }
-      allDataKey= '';
+      allDataKey = '';
     })
-   this.dataSource.data = result;
+    this.dataSource.data = result;
   }
 
   addColumn() {
@@ -166,10 +172,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     // console.log('sub ', this.getSublevel(data, 0, groupByColumns, rootGroup))
     return this.getSublevel(data, 0, groupByColumns, rootGroup);
   }
-  
+
   uniqueBy(a: any, key: any) {
     var seen: any = {};
-    return a.filter( (item: any) => {
+    return a.filter((item: any) => {
       var k = key(item);
       return seen.hasOwnProperty(k) ? false : (seen[k] = true);
     });
@@ -217,5 +223,11 @@ export class AppComponent implements OnInit, AfterViewInit {
   isGroup(index: any, item: any): boolean {
     return item.level;
   }
-
+  paging(event: PageEvent) {
+    this.pageSize = event.pageSize;
+  }
+  exportAsExcel()
+    {
+      // this.excelService.exportAsExcelFile(this.dataSource.data, 'sample');
+    }
 }

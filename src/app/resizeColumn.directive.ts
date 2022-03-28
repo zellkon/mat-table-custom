@@ -47,7 +47,6 @@ export class ResizeColumnDirective implements OnInit {
     const offset = 35;
     if (this.pressed && event.buttons) {
       this.renderer.addClass(this.table, "resizing");
-
       // Calculate width of column
       let width =
         this.startWidth + (event.pageX - this.startX - offset);
@@ -60,7 +59,9 @@ export class ResizeColumnDirective implements OnInit {
     
           // Set table cells width
           for (const cell of tableCells) {
-            this.renderer.setStyle(cell, "width", `${width}px`);
+            if (cell) {
+              this.renderer.setStyle(cell, "width", `${width}px`);
+            }
           }
         }
     }
