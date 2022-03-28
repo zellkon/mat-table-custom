@@ -41,7 +41,6 @@ export class ResizeColumnDirective implements OnInit {
     this.pressed = true;
     this.startX = event.pageX;
     this.startWidth = this.column.offsetWidth;
-    console.log(this.table);
   };
 
   onMouseMove = (event: MouseEvent) => {

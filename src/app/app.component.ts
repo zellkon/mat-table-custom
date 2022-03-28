@@ -10,9 +10,17 @@ export interface Object {
   weight: number;
   symbol: string;
 }
+export class Group {
+  level: number = 0;
+  parent!: Group;
+  expanded: boolean = true;
+  get visible(): boolean {
+    return !this.parent || (this.parent.visible && this.parent.expanded);
+  }
+}
 const ELEMENT_DATA: Object[] = [
   { position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H' },
-  { position: 2, name: 'Helium', weight: 4.0026, symbol: 'H' },
+  { position: 1, name: 'Helium', weight: 4.0026, symbol: 'H' },
   { position: 2, name: 'Lithium', weight: 6.941, symbol: 'L' },
   { position: 3, name: 'Beryllium', weight: 9.0122, symbol: 'B' },
   { position: 4, name: 'Boron', weight: 10.811, symbol: 'B' },
@@ -35,29 +43,40 @@ export class AppComponent implements OnInit, AfterViewInit {
   paginator!: MatPaginator;
   displayedColumns: string[] = ['name', 'weight', 'symbol', 'position'];
   columnsToDisplay: any[] = this.displayedColumns.slice();
-  columsForFilter: any[] = this.displayedColumns.map(x => ({ column: x, display: true }));
-  dataSource: MatTableDataSource<Object>;
-  groupFilterItems: string[] = [];
+  columsForFilter: any[] = this.displayedColumns.map((x) => ({
+    column: x,
+    display: true,
+  }));
+  dataSource = new MatTableDataSource<Object | Group>([]);
   dataSourceGroup: any;
-  groupRow: string [] = ['1','2'];
   showColFilter = false;
   showFilter = false;
+  groupByColumns: string[] = [];
   constructor() {
-    this.dataSource = new MatTableDataSource(ELEMENT_DATA);
+    this.dataSource.data = this.addGroups(ELEMENT_DATA, this.groupByColumns);
+    this.dataSource.filterPredicate = this.customFilterPredicate.bind(this);
   }
   ngOnInit(): void {
   }
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
+    this.dataSource.paginator = this.paginator; 
     this.dataSource.sort = this.sort;
   }
   applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+    this.groupByColumns = []; // reset group
+    let result: any[] = [];
+    let allDataKey = '';
+    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
+    ELEMENT_DATA.forEach((value: any) => {
+      Object.keys(value).forEach( key => {
+        allDataKey+= value[key].toString();
+      })
+      if (allDataKey.toLowerCase().includes(filterValue)) {
+        result.push(value);
+      }
+      allDataKey= '';
+    })
+   this.dataSource.data = result;
   }
 
   addColumn() {
@@ -83,16 +102,18 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
   dropGroup(event: CdkDragDrop<any>) {
-    if (this.groupFilterItems.findIndex(x => x.includes(event.item.data)) === -1) {
-      this.groupFilterItems.push(event.item.data);
+    if (this.groupByColumns.findIndex(x => x.includes(event.item.data)) === -1) {
+      this.groupByColumns.push(event.item.data);
     }
-    this.dataSourceGroup = this.groupByMultipleField(this.dataSource.data, ...this.groupFilterItems);
-    // this.groupRow = Object.keys(this.dataSourceGroup);
-    console.log(this.dataSourceGroup);
+    this.dataSource.data = this.addGroups(ELEMENT_DATA, this.groupByColumns);
+    this.dataSource.filterPredicate = this.customFilterPredicate.bind(this);
+    console.log(this.dataSource.data);
   }
 
   removeGroupFilterItem(column: string) {
-    this.groupFilterItems.splice(this.groupFilterItems.findIndex(x => x.includes(column)), 1);
+    this.groupByColumns.splice(this.groupByColumns.findIndex(x => x.includes(column)), 1);
+    this.dataSource.data = this.addGroups(ELEMENT_DATA, this.groupByColumns);
+    this.dataSource.filterPredicate = this.customFilterPredicate.bind(this);
   }
   // resize Col by Directive
   checkedColumn(column: string): boolean {
@@ -109,35 +130,92 @@ export class AppComponent implements OnInit, AfterViewInit {
   resetFilterCol() {
     this.columsForFilter = this.displayedColumns.map(x => ({ column: x, display: true }));
   }
-  // func Group By Field for Data
 
-  groupBySingleField(data: any[], field: string) {
-    return data.reduce((acc:any, value: any) => {
-      (acc[value[field]] = acc[value[field]] || []).push(value);
-      return acc;
-    }, {});
+  // new template
+
+  customFilterPredicate(data: Object | Group, filter: string): boolean {
+    return data instanceof Group ? data.visible : this.getDataRowVisible(data);
   }
 
-  groupByMultipleField(data: any, ...fields: any) {
-    console.log(fields)
-    if (fields.length === 0) return;
-    let newData: any = {};
-    const [field] = fields;
-    newData = this.groupBySingleField(data, field);
-    const remainingFields = fields.slice(1);
-    if (remainingFields.length > 0) {
-      Object.keys(newData).forEach((key) => {
-        newData[key] = this.groupByMultipleField(newData[key], ...remainingFields)
-      })
-    }
-    return newData;
+  getDataRowVisible(data: Object): boolean {
+    const groupRows = this.dataSource.data.filter((row) => {
+      if (!(row instanceof Group)) return false;
+
+      let match = true;
+      this.groupByColumns.forEach((column) => {
+        if (!row[column as keyof Group] || !data[column as keyof Object] || row[column as keyof Group] !== data[column as keyof Object])
+          match = false;
+      });
+      return match;
+    });
+
+    if (groupRows.length === 0) return true;
+    if (groupRows.length > 1) throw 'Data row is in more than one group!';
+    const parent = <Group>groupRows[0]; // </Group> (Fix syntax coloring)
+
+    return parent.visible && parent.expanded;
   }
+
+  groupHeaderClick(row: any) {
+    row.expanded = !row.expanded;
+    this.dataSource.filter = performance.now().toString(); // hack to trigger filter refresh
+  }
+
+  addGroups(data: any[], groupByColumns: string[]): any[] {
+    var rootGroup = new Group();
+    // console.log('sub ', this.getSublevel(data, 0, groupByColumns, rootGroup))
+    return this.getSublevel(data, 0, groupByColumns, rootGroup);
+  }
+  
+  uniqueBy(a: any, key: any) {
+    var seen: any = {};
+    return a.filter( (item: any) => {
+      var k = key(item);
+      return seen.hasOwnProperty(k) ? false : (seen[k] = true);
+    });
+  }
+  getSublevel(
+    data: any[],
+    level: number,
+    groupByColumns: string[],
+    parent: Group
+  ): any[] {
+    // Recursive function, stop when there are no more levels.
+    if (level >= groupByColumns.length) return data;
+
+    var groups = this.uniqueBy(
+      data.map((row) => {
+        var result: any = new Group();
+        result.level = level + 1;
+        result.parent = parent;
+        for (var i = 0; i <= level; i++)
+          result[groupByColumns[i]] = row[groupByColumns[i]];
+        return result;
+      }),
+      JSON.stringify
+    );
+    const currentColumn = groupByColumns[level];
+
+    var subGroups: any[] = [];
+    groups.forEach((group: Group) => {
+      let rowsInGroup = data.filter(
+        (row) => group[currentColumn as keyof Group] === row[currentColumn]
+      );
+      let subGroup = this.getSublevel(
+        rowsInGroup,
+        level + 1,
+        groupByColumns,
+        group
+      );
+      subGroup.unshift(group);
+      subGroups = subGroups.concat(subGroup);
+    });
+    return subGroups;
+  }
+
 
   isGroup(index: any, item: any): boolean {
-    console.log(this.dataSourceGroup)
-    return this.dataSourceGroup;
+    return item.level;
   }
-  test(data: any) {
-    console.log(data);
-  }
+
 }

@@ -16,11 +16,11 @@
     <div
       style="height: 100px; width: 100%; display: flex; justify-content: start; align-items: center; background: lightgray;"
       cdkDropList (cdkDropListDropped)="dropGroup($event)">
-      <span *ngIf="groupFilterItems.length <= 0">
+      <span *ngIf="groupByColumns.length <= 0">
         Drag a column header and drop it here to group by that column
       </span>
       <mat-chip-list>
-        <mat-chip *ngFor="let item of groupFilterItems" (removed)="removeGroupFilterItem(item)">
+        <mat-chip *ngFor="let item of groupByColumns" (removed)="removeGroupFilterItem(item)">
           {{item}}
           <button matChipRemove>
             <mat-icon>cancel</mat-icon>
@@ -29,8 +29,8 @@
       </mat-chip-list>
     </div>
     <div style="width: 100%;">
-      <table mat-table multiTemplateDataRows [dataSource]="dataSource" matSort cdkDropList cdkDropListOrientation="horizontal"
-        (cdkDropListDropped)="dropCol($event)">
+      <table mat-table [dataSource]="dataSource" matSort cdkDropList
+        cdkDropListOrientation="horizontal" (cdkDropListDropped)="dropCol($event)">
         <ng-container *ngFor="let column of columnsToDisplay; let i = index;" [matColumnDef]="column">
           <th mat-header-cell *matHeaderCellDef [resizeColumn]="true" [index]="i">
             <div fxLayout="row" fxLayoutAlign="space-between center">
@@ -79,16 +79,22 @@
             {{element[column]}}
           </td>
         </ng-container>
-         <!-- Group Table -->
-          <ng-container matColumnDef="groupHeader">
-            <td mat-cell [attr.colspan]="columnsToDisplay.length" *matCellDef="let dataSourceGroup">
-              <div *ngFor="let item of groupFilterItems; let i = index">
-                <strong>{{dataSourceGroup[item]}}</strong>
+        <ng-container matColumnDef="groupHeader">
+          <td style="background: darkcyan;" [attr.colspan]="columnsToDisplay.length" mat-cell *matCellDef="let group"
+            [style.paddingLeft.px]="20*group.level">
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10">
+              <mat-icon style="color: chartreuse;" *ngIf="group.expanded">remove_circle_outline</mat-icon>
+              <mat-icon style="color: chartreuse;" *ngIf="!group.expanded">add_circle_outline</mat-icon>
+              <div style="text-transform: uppercase; color: white; font-size: small; font-weight: 700;">{{groupByColumns[group.level-1]}}:
               </div>
-            </td>
-            </ng-container>
-            <tr [ngStyle]="groupFilterItems.length > 0 ? {} : {'display': 'none'}" mat-row *matRowDef="let row; columns: ['groupHeader'];"></tr>
-          <!--End Group Table -->
+              <div style="text-transform: uppercase; color: red; font-size: small; font-weight: 500;">{{group[groupByColumns[group.level-1]]}}</div>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-row *matRowDef="let row; columns: ['groupHeader']; when: isGroup"
+          [ngClass]="{'isGroup': isGroup === row}" (click)="groupHeaderClick(row)"></tr>
+          
         <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
         <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
       </table>
@@ -96,3 +102,4 @@
     </div>
   </div>
 </div>
+
