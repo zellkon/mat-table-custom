@@ -228,6 +228,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
   exportAsExcel()
     {
-      // this.excelService.exportAsExcelFile(this.dataSource.data, 'sample');
+      this.excelService.exportAsExcelFile(this.dataSource.data, 'sample');
     }
 }
