@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -46,6 +46,7 @@ export class MatDatatableComponent implements OnInit, AfterViewInit {
   @Input() pageSize = 50;
   @Input() pageSizeOptions= [50, 100];
   @Input() pageIndex = 0;
+  @Output() pagingEvent: EventEmitter<any> = new EventEmitter<any>();
   constructor(
     private excelService:ExcelService
   ) {
@@ -221,6 +222,7 @@ export class MatDatatableComponent implements OnInit, AfterViewInit {
   paging(event: PageEvent) {
     this.pageSize = event.pageSize;
     this.pageIndex = event.pageIndex;
+    this.pagingEvent.emit(event);
   }
   exportAsExcel()
     {

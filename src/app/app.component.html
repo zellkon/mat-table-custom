@@ -1,1 +1,1 @@
-<mat-datatable [data]="data" [displayedColumns]="displayedColumns" [groupByColumns]="group" [pageSizeOptions]="[20, 50 , 100]"></mat-datatable>
+<mat-datatable [data]="data" [displayedColumns]="displayedColumns" [groupByColumns]="group" [pageSizeOptions]="[20, 50 , 100]" (pagingEvent)="getPagingEvent($event)"></mat-datatable>

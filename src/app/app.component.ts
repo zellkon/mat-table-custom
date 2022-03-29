@@ -13,5 +13,7 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
 
   }
-
+  getPagingEvent(e: any) {
+    console.log(e);
+  } 
 }
