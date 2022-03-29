@@ -1,0 +1,92 @@
+<div style="width: 100%;" fxLayout="column" fxLayoutAlign="center center">
+  <div style="width: 100%;" fxLayout="row" fxLayoutAlign="space-between center">
+    <div>
+      <mat-form-field appearance="outline">
+        <mat-label>Search</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Search in all columns" #input>
+      </mat-form-field>
+    </div>
+    <div>
+    </div>
+  </div>
+
+  <div style="width: 100%;" fxLayout="column" fxLayoutAlign="center center" cdkDropListGroup>
+    <div
+      style="height: 100px; width: 100%; display: flex; justify-content: start; align-items: center; background: lightgray;"
+      cdkDropList (cdkDropListDropped)="dropGroup($event)">
+      <span *ngIf="groupByColumns.length <= 0">
+        Drag a column header and drop it here to group by that column
+      </span>
+      <mat-chip-list>
+        <mat-chip *ngFor="let item of groupByColumns" (removed)="removeGroupFilterItem(item)">
+          {{item}}
+          <button matChipRemove>
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip>
+      </mat-chip-list>
+    </div>
+    <div style="width: 100%;">
+      <table #table mat-table [dataSource]="dataSource" matSort (matSortChange)="test($event)" cdkDropList
+        cdkDropListOrientation="horizontal" (cdkDropListDropped)="dropCol($event)">
+        <ng-container *ngFor="let column of columnsToDisplay; let i = index;" [matColumnDef]="column">
+          <th mat-header-cell *matHeaderCellDef [resizeColumn]="true" [index]="i">
+            <div fxLayout="row" fxLayoutAlign="space-between center">
+              <div cdkDrag [cdkDragData]="column" mat-sort-header>
+                {{column}}
+              </div>
+              <div>
+                <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Menu">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <div fxLayout="column" fxLayoutAlign="center center">
+                    <button mat-menu-item #col_filter
+                      (click)="$event.stopPropagation(); showColFilter = !showColFilter">
+                      <mat-icon>reorder</mat-icon>
+                      <span>Columns</span>
+                    </button>
+                    <div *ngIf="showColFilter" style="width: 100%; padding: 0px 16px 0px 16px;" fxLayout="column"
+                      fxLayoutAlign="center start">
+                      <div *ngFor="let obj of columsForFilter; let i=index">
+                        <mat-checkbox (change)="colFilter($event, i)" [checked]="obj.display"
+                          (click)="$event.stopPropagation();">{{obj.column}}</mat-checkbox>
+                      </div>
+                      <div fxLayout="row" fxLayoutAlign="space-between center">
+                        <button mat-raised-button color="basic"
+                          (click)="$event.stopPropagation(); resetFilterCol();">Reset</button>
+                        <button mat-raised-button color="primary" (click)="reloadTableWithFilter()">Apply</button>
+                      </div>
+                    </div>
+                  </div>
+                </mat-menu>
+              </div>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let element">
+            {{element[column]}}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="groupHeader">
+          <td style="background: rgb(33, 166, 228);" [attr.colspan]="columnsToDisplay.length" mat-cell *matCellDef="let group"
+            [style.paddingLeft.px]="20*group.level">
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10">
+              <mat-icon style="color: chartreuse;" *ngIf="group.expanded">remove_circle_outline</mat-icon>
+              <mat-icon style="color: chartreuse;" *ngIf="!group.expanded">add_circle_outline</mat-icon>
+              <div style="text-transform: uppercase; color: white; font-size: small; font-weight: 700;">{{groupByColumns[group.level-1]}}:
+              </div>
+              <div style="text-transform: uppercase; color: red; font-size: small; font-weight: 500;">{{group[groupByColumns[group.level-1]]}}</div>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-row *matRowDef="let row; columns: ['groupHeader']; when: isGroup"
+          [ngClass]="{'isGroup': isGroup === row}" (click)="groupHeaderClick(row)"></tr>
+          
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
+      </table>
+      <mat-paginator role="group" [pageSizeOptions]="pageSizeOptions" (page)="paging($event)" [pageSize]="pageSize" [pageIndex]="pageIndex"></mat-paginator>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,48 @@
+<div>
+  <h3>
+    Row Grouping
+    <small>
+      <a
+        href="https://github.com/swimlane/ngx-datatable/blob/master/src/app/basic/row-grouping.component.ts"
+        target="_blank"
+      >
+        Source
+      </a>
+    </small>
+  </h3>
+  <ngx-datatable
+    #myTable
+    class="material expandable"
+    [rows]="rows"
+    [groupRowsBy]="'symbol'"
+    [columnMode]="ColumnMode.force"
+    [scrollbarH]="true"
+    [headerHeight]="50"
+    [footerHeight]="50"
+    [rowHeight]="40"
+    [limit]="4"
+    [groupExpansionDefault]="true"
+  >
+    <!-- Group Header Template -->
+    <ngx-datatable-group-header [rowHeight]="50" #myGroupHeader (toggle)="onDetailToggle($event)">
+      <ng-template let-group="group" let-expanded="expanded" ngx-datatable-group-header-template>
+        <div style="padding-left:5px;">
+          <a
+            href="#"
+            [class.datatable-icon-right]="!expanded"
+            [class.datatable-icon-down]="expanded"
+            title="Expand/Collapse Group"
+            (click)="toggleExpandGroup(group)"
+          >
+            <b>Symbol: {{ group.value[0].symbol }}</b>
+          </a>
+        </div>
+      </ng-template>
+    </ngx-datatable-group-header>
+    <!-- Row Column Template -->
+    <ngx-datatable-column name="Position" prop="position"></ngx-datatable-column>
+    <ngx-datatable-column name="Name" prop="name" editable="true"></ngx-datatable-column>
+    <ngx-datatable-column name="Weight" prop="weight"></ngx-datatable-column>
+    <ngx-datatable-column name="Symbol" prop="symbol"></ngx-datatable-column>
+  </ngx-datatable>
+</div>
