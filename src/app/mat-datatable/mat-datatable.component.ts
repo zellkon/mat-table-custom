@@ -236,4 +236,25 @@ export class MatDatatableComponent implements OnInit, AfterViewInit {
     // this.dataSource.filterPredicate = this.customFilterPredicate.bind(this);
     // console.log(this.dataSource.data);
   }
+  
+
+ buildTree(items: any [], ...keys: any[]) {
+  const result: any = [];
+  const keySet = new Set();
+  const groupByKey = keys.shift();
+  items.forEach(item => {
+    if (!keySet.has(item[groupByKey])) {
+      keySet.add(item[groupByKey]);
+      result.push({[groupByKey]: item[groupByKey], children: [item]})
+    } else {
+      result.find((res: any) => res[groupByKey] === item[groupByKey]).children.push(item);
+    }
+  });
+  if(keys.length) {
+    result.forEach((res: any) => {
+      res.children = this.buildTree(res.children, ...keys);
+    })
+  }
+  return result;
+}
 }
